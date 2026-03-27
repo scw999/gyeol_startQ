@@ -80,9 +80,43 @@ body {
 /* ═══════════════════════════════════════ */
 .proto-wrap {
   display: flex;
-  justify-content: center;
-  padding: 32px 16px 60px;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 60px;
+  gap: 16px;
 }
+
+/* ── REFRESH BUTTON ── */
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border: 1.5px solid rgba(184, 169, 232, 0.3);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(8px);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.refresh-btn:hover {
+  border-color: var(--lavender);
+  color: var(--deep-plum);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 12px rgba(184, 169, 232, 0.15);
+}
+.refresh-btn:active { transform: scale(0.97); }
+.refresh-btn .ri {
+  display: inline-block;
+  font-size: 15px;
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.refresh-btn:hover .ri { transform: rotate(-180deg); }
+
 .phone-frame {
   width: 390px;
   height: 780px;
@@ -129,7 +163,6 @@ body {
 .screen.active { opacity: 1; transform: translateY(0); pointer-events: all; }
 .screen.exit { opacity: 0; transform: translateY(-25px); pointer-events: none; }
 
-/* progress */
 .progress-wrap {
   padding-top: 40px;
   padding-bottom: 6px;
@@ -145,7 +178,6 @@ body {
 .question em { font-style: normal; background: linear-gradient(120deg, var(--lavender), var(--rose-gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .sub-text { font-size: 13px; color: var(--text-secondary); margin-top: 8px; line-height: 1.6; }
 
-/* options */
 .options { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; flex-shrink: 0; }
 .option-card {
   background: rgba(255,255,255,0.82);
@@ -207,193 +239,64 @@ body {
 .summary-label { color: var(--text-hint); }
 .summary-value { color: var(--deep-plum); font-weight: 600; }
 
+/* profile complete btn */
+.profile-go-btn {
+  width: 100%; height: 50px; border: none; border-radius: 14px;
+  font-family: 'Noto Sans KR', sans-serif; font-size: 15px; font-weight: 700; color: white; cursor: pointer;
+  background: linear-gradient(135deg, var(--lavender), var(--rose-gold));
+  box-shadow: 0 4px 16px rgba(184,169,232,0.25);
+  transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+}
+.profile-go-btn:hover { transform: translateY(-1px); }
+.profile-go-btn:active { transform: scale(0.98); }
+.profile-go-btn.done {
+  background: linear-gradient(135deg, #66BB6A, #43A047);
+  box-shadow: 0 4px 16px rgba(102,187,106,0.3);
+  pointer-events: none;
+}
+
 /* ═══════════════════════════════════════ */
 /* ── ANALYSIS TAB                      ── */
 /* ═══════════════════════════════════════ */
-.analysis-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 40px 24px 80px;
-}
-.doc-header {
-  text-align: center;
-  margin-bottom: 48px;
-}
-.doc-badge {
-  display: inline-block;
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: var(--deep-plum);
-  background: var(--lavender-light);
-  margin-bottom: 16px;
-}
-.doc-title {
-  font-family: 'Noto Serif KR', serif;
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--deep-plum);
-  line-height: 1.4;
-  margin-bottom: 12px;
-}
-.doc-subtitle {
-  font-size: 15px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
+.analysis-container { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+.doc-header { text-align: center; margin-bottom: 48px; }
+.doc-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: var(--deep-plum); background: var(--lavender-light); margin-bottom: 16px; }
+.doc-title { font-family: 'Noto Serif KR', serif; font-size: 32px; font-weight: 700; color: var(--deep-plum); line-height: 1.4; margin-bottom: 12px; }
+.doc-subtitle { font-size: 15px; color: var(--text-secondary); line-height: 1.6; }
 
-/* Theory blocks */
-.theory-section {
-  margin-bottom: 40px;
-}
-.theory-section-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: var(--lavender);
-  margin-bottom: 12px;
-  text-transform: uppercase;
-}
-.theory-card {
-  background: white;
-  border-radius: 20px;
-  padding: 28px;
-  box-shadow: 0 4px 24px rgba(74,48,96,0.06);
-  border: 1px solid rgba(184,169,232,0.1);
-}
-.theory-card h3 {
-  font-family: 'Noto Serif KR', serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--deep-plum);
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.theory-card h3 .emoji-icon {
-  font-size: 28px;
-}
-.theory-card p, .theory-card li {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.8;
-  word-break: keep-all;
-}
+.theory-section { margin-bottom: 40px; }
+.theory-section-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--lavender); margin-bottom: 12px; text-transform: uppercase; }
+.theory-card { background: white; border-radius: 20px; padding: 28px; box-shadow: 0 4px 24px rgba(74,48,96,0.06); border: 1px solid rgba(184,169,232,0.1); }
+.theory-card h3 { font-family: 'Noto Serif KR', serif; font-size: 20px; font-weight: 700; color: var(--deep-plum); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+.theory-card h3 .emoji-icon { font-size: 28px; }
+.theory-card p, .theory-card li { font-size: 14px; color: var(--text-secondary); line-height: 1.8; word-break: keep-all; }
 .theory-card p + p { margin-top: 12px; }
 .theory-card strong { color: var(--text-primary); font-weight: 600; }
 .theory-card em { font-style: normal; color: var(--deep-plum); font-weight: 600; }
 
-/* evidence box */
-.evidence-box {
-  margin-top: 16px;
-  background: var(--lavender-bg);
-  border-radius: 12px;
-  padding: 16px 18px;
-  border-left: 3px solid var(--lavender);
-}
-.evidence-box .ev-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--deep-plum);
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-}
-.evidence-box p {
-  font-size: 13px !important;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
+.evidence-box { margin-top: 16px; background: var(--lavender-bg); border-radius: 12px; padding: 16px 18px; border-left: 3px solid var(--lavender); }
+.evidence-box .ev-label { font-size: 11px; font-weight: 700; color: var(--deep-plum); letter-spacing: 1px; margin-bottom: 8px; }
+.evidence-box p { font-size: 13px !important; color: var(--text-secondary); line-height: 1.7; }
 
-/* risk box */
-.risk-box {
-  margin-top: 16px;
-  background: var(--amber-soft);
-  border-radius: 12px;
-  padding: 16px 18px;
-  border-left: 3px solid #FFB74D;
-}
-.risk-box .risk-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--amber-text);
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-}
-.risk-box p {
-  font-size: 13px !important;
-  color: #795548;
-  line-height: 1.7;
-}
+.risk-box { margin-top: 16px; background: var(--amber-soft); border-radius: 12px; padding: 16px 18px; border-left: 3px solid #FFB74D; }
+.risk-box .risk-label { font-size: 11px; font-weight: 700; color: var(--amber-text); letter-spacing: 1px; margin-bottom: 8px; }
+.risk-box p { font-size: 13px !important; color: #795548; line-height: 1.7; }
 
-/* solution box */
-.solution-box {
-  margin-top: 16px;
-  background: var(--green-soft);
-  border-radius: 12px;
-  padding: 16px 18px;
-  border-left: 3px solid #66BB6A;
-}
-.solution-box .sol-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--green-text);
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-}
-.solution-box p {
-  font-size: 13px !important;
-  color: #33691E;
-  line-height: 1.7;
-}
+.solution-box { margin-top: 16px; background: var(--green-soft); border-radius: 12px; padding: 16px 18px; border-left: 3px solid #66BB6A; }
+.solution-box .sol-label { font-size: 11px; font-weight: 700; color: var(--green-text); letter-spacing: 1px; margin-bottom: 8px; }
+.solution-box p { font-size: 13px !important; color: #33691E; line-height: 1.7; }
 
-/* step analysis cards */
-.step-analysis {
-  margin-bottom: 32px;
-}
-.step-num-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  color: white;
-  background: linear-gradient(135deg, var(--deep-plum), var(--lavender));
-  margin-bottom: 14px;
-}
-.step-card {
-  background: white;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 4px 24px rgba(74,48,96,0.06);
-  border: 1px solid rgba(184,169,232,0.1);
-}
-.step-card-header {
-  padding: 24px 28px 16px;
-  border-bottom: 1px solid rgba(184,169,232,0.08);
-}
-.step-card-header h3 {
-  font-family: 'Noto Serif KR', serif;
-  font-size: 19px;
-  font-weight: 700;
-  color: var(--deep-plum);
-  margin-bottom: 6px;
-}
-.step-card-header .q-preview {
-  font-size: 14px;
-  color: var(--text-hint);
-  font-style: italic;
-}
+.step-analysis { margin-bottom: 32px; }
+.step-num-badge { display: inline-flex; align-items: center; gap: 8px; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; color: white; background: linear-gradient(135deg, var(--deep-plum), var(--lavender)); margin-bottom: 14px; }
+.step-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 24px rgba(74,48,96,0.06); border: 1px solid rgba(184,169,232,0.1); }
+.step-card-header { padding: 24px 28px 16px; border-bottom: 1px solid rgba(184,169,232,0.08); }
+.step-card-header h3 { font-family: 'Noto Serif KR', serif; font-size: 19px; font-weight: 700; color: var(--deep-plum); margin-bottom: 6px; }
+.step-card-header .q-preview { font-size: 14px; color: var(--text-hint); font-style: italic; }
 .step-card-body { padding: 20px 28px 24px; }
 .step-card-body p { font-size: 14px; color: var(--text-secondary); line-height: 1.8; word-break: keep-all; }
 .step-card-body p + p { margin-top: 10px; }
 .step-card-body strong { color: var(--text-primary); }
 
-/* tag system */
 .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 .tag { display: inline-block; padding: 4px 11px; border-radius: 20px; font-size: 11px; font-weight: 600; }
 .tag.green { background: var(--green-soft); color: var(--green-text); }
@@ -402,117 +305,27 @@ body {
 .tag.blue { background: var(--blue-soft); color: var(--blue-text); }
 .tag.red { background: var(--red-soft); color: var(--red-text); }
 
-/* option breakdown */
-.option-breakdown {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.ob-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: #FAFAFA;
-  border: 1px solid #F0EDF5;
-}
+.option-breakdown { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+.ob-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border-radius: 10px; background: #FAFAFA; border: 1px solid #F0EDF5; }
 .ob-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
 .ob-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
 .ob-text strong { color: var(--text-primary); }
 
-/* flow diagram */
-.flow-diagram {
-  margin-top: 32px;
-  background: white;
-  border-radius: 20px;
-  padding: 28px;
-  box-shadow: 0 4px 24px rgba(74,48,96,0.06);
-  border: 1px solid rgba(184,169,232,0.1);
-}
-.flow-diagram h3 {
-  font-family: 'Noto Serif KR', serif;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--deep-plum);
-  margin-bottom: 20px;
-  text-align: center;
-}
-.flow-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  align-items: center;
-}
-.flow-step {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  max-width: 460px;
-  padding: 14px 18px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(184,169,232,0.06), rgba(232,180,184,0.04));
-}
-.flow-step-num {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--lavender), var(--rose-gold));
-  color: white; font-weight: 700; font-size: 14px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.flow-step-content {
-  flex: 1;
-}
+.flow-diagram { margin-top: 32px; background: white; border-radius: 20px; padding: 28px; box-shadow: 0 4px 24px rgba(74,48,96,0.06); border: 1px solid rgba(184,169,232,0.1); }
+.flow-diagram h3 { font-family: 'Noto Serif KR', serif; font-size: 18px; font-weight: 700; color: var(--deep-plum); margin-bottom: 20px; text-align: center; }
+.flow-steps { display: flex; flex-direction: column; gap: 0; align-items: center; }
+.flow-step { display: flex; align-items: center; gap: 14px; width: 100%; max-width: 460px; padding: 14px 18px; border-radius: 12px; background: linear-gradient(135deg, rgba(184,169,232,0.06), rgba(232,180,184,0.04)); }
+.flow-step-num { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--lavender), var(--rose-gold)); color: white; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.flow-step-content { flex: 1; }
 .flow-step-title { font-size: 14px; font-weight: 700; color: var(--deep-plum); }
 .flow-step-desc { font-size: 12px; color: var(--text-hint); margin-top: 2px; }
-.flow-arrow {
-  text-align: center;
-  color: var(--lavender);
-  font-size: 18px;
-  padding: 4px 0;
-}
-.emotion-bar {
-  margin-top: 20px;
-  background: #FAFAFA;
-  border-radius: 12px;
-  padding: 16px 18px;
-}
+.flow-arrow { text-align: center; color: var(--lavender); font-size: 18px; padding: 4px 0; }
+.emotion-bar { margin-top: 20px; background: #FAFAFA; border-radius: 12px; padding: 16px 18px; }
 .emotion-bar-label { font-size: 12px; font-weight: 600; color: var(--text-hint); margin-bottom: 10px; }
-.emotion-bar-track {
-  height: 28px;
-  border-radius: 14px;
-  background: linear-gradient(90deg,
-    rgba(184,169,232,0.15) 0%,
-    rgba(184,169,232,0.5) 25%,
-    rgba(184,169,232,0.8) 50%,
-    rgba(232,180,184,0.7) 75%,
-    rgba(232,180,184,0.4) 100%
-  );
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 12px;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--deep-plum);
-}
-.emotion-peak {
-  position: absolute;
-  top: -6px;
-  left: 48%;
-  font-size: 16px;
-}
+.emotion-bar-track { height: 28px; border-radius: 14px; background: linear-gradient(90deg, rgba(184,169,232,0.15) 0%, rgba(184,169,232,0.5) 25%, rgba(184,169,232,0.8) 50%, rgba(232,180,184,0.7) 75%, rgba(232,180,184,0.4) 100%); position: relative; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 10px; font-weight: 600; color: var(--deep-plum); }
+.emotion-peak { position: absolute; top: -6px; left: 48%; font-size: 16px; }
 
-/* divider */
-.section-divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--lavender), transparent);
-  margin: 48px 0;
-  opacity: 0.3;
-}
+.section-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--lavender), transparent); margin: 48px 0; opacity: 0.3; }
 </style>
 </head>
 <body>
@@ -528,6 +341,12 @@ body {
 <!-- ═══════════════════════════════════════════ -->
 <div class="tab-panel active" id="tab-proto">
 <div class="proto-wrap">
+
+  <!-- ★ 새로고침 버튼 (폰 프레임 바깥 위) -->
+  <button class="refresh-btn" onclick="resetProto()">
+    <span class="ri">↻</span> 처음부터 다시하기
+  </button>
+
 <div class="phone-frame">
   <div class="phone-notch"></div>
   <div class="bg-orb a"></div>
@@ -607,13 +426,15 @@ body {
     <div class="bottom-area"><button class="next-btn" id="btn-4" onclick="goTo(5)">프로필 만들러 가기 →</button></div>
   </div>
 
-  <!-- Screen 5 -->
+  <!-- Screen 5 — ★ alert 제거, 인라인 상태 변경으로 교체 -->
   <div class="screen complete-screen" id="screen-5">
     <div class="complete-ring">💜</div>
     <div class="complete-title">마음을 들었어요</div>
     <p class="complete-msg"><strong>당신</strong>의 마음에 맞는<br>매칭을 준비할게요.<br><br>이제 <strong>프로필</strong>을 만들어볼까요?</p>
     <div class="summary-card" id="summaryCard"></div>
-    <div class="bottom-area" style="width:100%"><button class="next-btn enabled" onclick="alert('→ 프로필 생성 플로우로 이동')">프로필 만들기 →</button></div>
+    <div class="bottom-area" style="width:100%">
+      <button class="profile-go-btn" id="profileGoBtn" onclick="handleProfileGo(this)">프로필 만들기 →</button>
+    </div>
   </div>
 </div>
 </div>
@@ -675,12 +496,10 @@ body {
     <div class="theory-section-label">리스크 분석 & 해결</div>
     <div class="theory-card">
       <h3><span class="emoji-icon">⚠️</span> 이탈 마찰 리스크</h3>
-
       <div class="risk-box">
         <div class="risk-label">🔴 리스크</div>
         <p>질문이 무겁거나 개수가 많으면 <strong>"가입도 안 했는데 왜 이렇게 물어봐?"</strong>라는 반감 발생. 특히 "결혼 실패 경험이 있나요?"같은 민감한 질문은 즉시 이탈 유발. 한국 유저는 개인 정보 노출에 예민하고, 결혼 관련 질문은 압박으로 느끼기 쉬움.</p>
       </div>
-
       <div class="solution-box" style="margin-top: 12px;">
         <div class="sol-label">✅ 해결 설계</div>
         <p><strong>1) 질문 개수 3~4개 제한.</strong> 인지심리학의 "Miller's Law" (7±2)보다 훨씬 적게. 60초 안에 끝나야 함.</p>
@@ -688,12 +507,10 @@ body {
         <p><strong>3) 안전밸브 선택지.</strong> 각 질문마다 "아직 고민 중이에요", "시기보다 사람이 중요해요" 같은 부담 없는 옵션을 반드시 포함. 이것이 압박감을 제거하면서도 일관성 원칙은 여전히 작동하게 만듦.</p>
         <p><strong>4) 부정적 프레임 제거.</strong> "이혼 경험", "실패", "불안" 같은 단어 금지. 모든 선택지가 긍정적 미래만 포함.</p>
       </div>
-
       <div class="risk-box" style="margin-top: 12px;">
         <div class="risk-label">🟡 부차 리스크: "세뇌 당하는 느낌"</div>
         <p>지나치게 유도적인 질문은 영리한 사용자에게 <strong>조작감</strong>을 줄 수 있음. "이거 나를 컨트롤하려고 하는 거 아니야?"</p>
       </div>
-
       <div class="solution-box" style="margin-top: 12px;">
         <div class="sol-label">✅ 해결 설계</div>
         <p>질문을 <strong>"당신을 이해하기 위한 질문"</strong>으로 프레이밍. "프로필을 만들기 전에 당신의 마음을 먼저 들려주세요"라는 도입 문구가 이 역할을 함. 유도가 아니라 <em>배려</em>로 인식되도록 톤 설계.</p>
@@ -707,7 +524,6 @@ body {
   <div class="theory-section">
     <div class="theory-section-label">질문별 설계 분석</div>
 
-    <!-- STEP 1 -->
     <div class="step-analysis">
       <div class="step-num-badge">STEP 1 · 마음 확인</div>
       <div class="step-card">
@@ -723,7 +539,6 @@ body {
           </div>
           <p><strong>설계 의도:</strong> 가장 먼저 "결혼 의지"를 본인 입으로(손으로) 선언하게 합니다. "네, 하고 싶어요"를 터치한 순간 Cialdini의 <em>Commitment Effect</em>가 발동합니다. 이 사람은 이제 자기가 선택한 입장과 일관되게 행동하려 합니다.</p>
           <p><strong>왜 첫 질문인가:</strong> 가장 가볍고, 대부분이 "Yes"에 해당하는 질문으로 시작해야 <em>foot-in-the-door</em> 효과가 극대화됩니다. 첫 번째 "Yes"가 이후 모든 "Yes"의 문턱을 낮춥니다.</p>
-
           <div class="option-breakdown">
             <div class="ob-item"><div class="ob-icon">💍</div><div class="ob-text"><strong>"네, 진심으로 하고 싶어요"</strong> — 가장 강한 커밋. 이 선택자의 가입 완료율과 유료 전환율이 가장 높을 것으로 예측.</div></div>
             <div class="ob-item"><div class="ob-icon">🌱</div><div class="ob-text"><strong>"좋은 사람이 있다면요"</strong> — 조건부 커밋. 앱의 매칭 품질이 중요. "우리가 그 좋은 사람을 찾아드리겠다"는 후속 메시지와 연결.</div></div>
@@ -734,7 +549,6 @@ body {
       </div>
     </div>
 
-    <!-- STEP 2 -->
     <div class="step-analysis">
       <div class="step-num-badge">STEP 2 · 감정 앵커링 (핵심)</div>
       <div class="step-card">
@@ -752,14 +566,12 @@ body {
           <p><strong>이 질문이 전체 흐름의 핵심입니다.</strong></p>
           <p><strong>"왜 결혼하고 싶어요?"를 쓰지 않는 이유:</strong> "왜"는 논리적 정당화를 요구합니다. 뇌의 전전두엽(논리 처리)이 활성화되면 방어 기제가 켜지고 "굳이 왜?"라는 역질문이 올라옵니다. 반면 <em>"어떤 마음이 드세요?"</em>는 감정을 묻습니다. 변연계(감정 처리)가 활성화되고, 사용자는 자연스럽게 <strong>결혼에 대한 긍정적 상상</strong>을 시작합니다.</p>
           <p><strong>선택지가 전부 긍정적 미래 이미지인 이유:</strong> "불안", "부모님 압박", "나이 걱정" 같은 현실적 동기는 의도적으로 배제했습니다. 사용자가 어떤 것을 골라도 "아, 결혼이란 좋은 거구나"라는 방향으로 자기설득이 일어나도록 설계되어 있습니다. <em>이것이 가장 강한 세뇌 포인트입니다.</em></p>
-
           <div class="option-breakdown">
             <div class="ob-item"><div class="ob-icon">🏠</div><div class="ob-text"><strong>"함께 쌓아가는 안정된 일상"</strong> — 안정 지향. 애착 유형 중 안정형과 상관. 매칭 시 생활 패턴 일치도 가중치 상향 가능.</div></div>
             <div class="ob-item"><div class="ob-icon">🌿</div><div class="ob-text"><strong>"서로를 성장시키는 동반자"</strong> — 성장 지향. 지적 호기심, 목표 지향적. 커리어·취미 공유 가중치 상향.</div></div>
             <div class="ob-item"><div class="ob-icon">👨‍👩‍👧</div><div class="ob-text"><strong>"따뜻한 가족을 만들고 싶어요"</strong> — 가족 지향. 자녀 계획, 부모 관계 등이 매칭의 핵심 변수가 됨을 암시.</div></div>
             <div class="ob-item"><div class="ob-icon">💜</div><div class="ob-text"><strong>"깊이 사랑하는 사람과 평생"</strong> — 로맨스 지향. 감정적 교감, 깊은 대화를 중시. 내면 호환성 가중치 극대화.</div></div>
           </div>
-
           <div class="evidence-box" style="margin-top: 16px;">
             <div class="ev-label">🔬 알고리즘 연동 가능성</div>
             <p>이 답변은 24문항 심리 검사 이전에 수집되는 "결혼 가치관 시드"로 활용 가능. Big Five 분석과 교차하면 매칭 정밀도를 높이는 <strong>프라이어(prior)</strong>로 작용합니다. 예: "안정" 선택 + 성실성 상위 → 안정형 매칭 타입 가중.</p>
@@ -768,7 +580,6 @@ body {
       </div>
     </div>
 
-    <!-- STEP 3 -->
     <div class="step-analysis">
       <div class="step-num-badge">STEP 3 · 타이밍 커밋</div>
       <div class="step-card">
@@ -784,7 +595,6 @@ body {
           </div>
           <p><strong>설계 의도:</strong> 시기를 선택하면 <em>심리적 데드라인</em>이 생깁니다. "1년 안에"를 고른 사람은 이 앱을 "빨리 결과를 내야 하는 도구"로 인식하게 되고, 유료 전환율이 가장 높을 것으로 예측됩니다.</p>
           <p><strong>"시기보다 사람이 중요해요"가 반드시 필요한 이유:</strong> 시기를 묻는 것 자체가 "결혼은 빨리 해야 한다"는 압박으로 느껴질 수 있습니다. 이 선택지가 <strong>안전밸브</strong> 역할을 합니다. 동시에, 이것을 선택한 사람도 "나는 결혼에 진지하지만 여유를 가진 사람"으로 자기 정의를 하게 됩니다 — 역시 자기설득.</p>
-
           <div class="option-breakdown">
             <div class="ob-item"><div class="ob-icon">⚡</div><div class="ob-text"><strong>"1년 안에"</strong> — 최고 긴급도. 매칭 알고리즘에서 결이음권 전환 넛지 강하게. 첫 매칭 제안까지의 시간도 단축 제공 가능.</div></div>
             <div class="ob-item"><div class="ob-icon">🗓️</div><div class="ob-text"><strong>"2~3년 안에"</strong> — 중간 긴급도. 정기적인 매칭 알림과 천천히 관계 형성하는 UX로 유도.</div></div>
@@ -794,7 +604,6 @@ body {
       </div>
     </div>
 
-    <!-- STEP 4 -->
     <div class="step-analysis">
       <div class="step-num-badge">STEP 4 · 기대 설정</div>
       <div class="step-card">
@@ -810,14 +619,12 @@ body {
           </div>
           <p><strong>설계 의도:</strong> 마지막 질문은 두 가지 역할을 합니다. 첫째, <strong>"이 앱이 내 취향을 알고 있다"는 느낌</strong>을 줍니다. "만남의 온도를 맞춰드릴게요"라는 문구는 개인화 약속이고, 사용자는 "내 기대에 맞춰준다고? 이건 다른 앱과 다르네"라고 느낍니다.</p>
           <p>둘째, <strong>실제 매칭 알고리즘에 반영 가능한 데이터</strong>입니다:</p>
-
           <div class="option-breakdown">
             <div class="ob-item"><div class="ob-icon">✨</div><div class="ob-text"><strong>"설레는 두근거림"</strong> — 외모/첫인상 가중치 상향. 프로필 사진 품질이 매칭에서 중요한 변수가 됨을 내부적으로 반영.</div></div>
             <div class="ob-item"><div class="ob-icon">☕</div><div class="ob-text"><strong>"편안한 대화"</strong> — 성격 호환성 가중치 상향. Big Five의 친화성/외향성 유사도에 가중.</div></div>
             <div class="ob-item"><div class="ob-icon">🎯</div><div class="ob-text"><strong>"서로의 진심"</strong> — 가치관 일치 가중치 상향. 24문항 결과에서 핵심 가치 항목(결혼관, 자녀관, 재정관)의 매칭 비중 확대.</div></div>
             <div class="ob-item"><div class="ob-icon">🤝</div><div class="ob-text"><strong>"검증된 신뢰감"</strong> — 인증/검증 데이터 가중치 상향. 직장인증, 학력인증이 완료된 유저를 우선 추천.</div></div>
           </div>
-
           <div class="evidence-box" style="margin-top: 16px;">
             <div class="ev-label">💡 심리적 착지 효과</div>
             <p>마지막 질문을 "기대"로 끝내면 사용자의 뇌는 <strong>희망 상태</strong>에서 온보딩을 마감합니다. "내가 원하는 만남이 실현될 수 있겠다"는 기대가 프로필 작성 동기를 만듭니다. 감정 곡선의 마지막을 긍정으로 닫는 것은 <em>Peak-End Rule</em>(Kahneman)에 의해 전체 경험의 인상을 결정합니다.</p>
@@ -832,80 +639,32 @@ body {
   <!-- ── SECTION 4: 전체 흐름 ── -->
   <div class="theory-section">
     <div class="theory-section-label">전체 흐름 구조</div>
-
     <div class="flow-diagram">
       <h3>감정 곡선 설계</h3>
       <div class="flow-steps">
-        <div class="flow-step">
-          <div class="flow-step-num">1</div>
-          <div class="flow-step-content">
-            <div class="flow-step-title">의지 확인</div>
-            <div class="flow-step-desc">가볍게 · Foot-in-the-door</div>
-          </div>
-        </div>
+        <div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-content"><div class="flow-step-title">의지 확인</div><div class="flow-step-desc">가볍게 · Foot-in-the-door</div></div></div>
         <div class="flow-arrow">↓</div>
-        <div class="flow-step">
-          <div class="flow-step-num">2</div>
-          <div class="flow-step-content">
-            <div class="flow-step-title">감정 앵커링 ← 핵심</div>
-            <div class="flow-step-desc">깊게 · 자기설득 극대화</div>
-          </div>
-        </div>
+        <div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-content"><div class="flow-step-title">감정 앵커링 ← 핵심</div><div class="flow-step-desc">깊게 · 자기설득 극대화</div></div></div>
         <div class="flow-arrow">↓</div>
-        <div class="flow-step">
-          <div class="flow-step-num">3</div>
-          <div class="flow-step-content">
-            <div class="flow-step-title">타이밍 커밋</div>
-            <div class="flow-step-desc">구체적 · 심리적 데드라인</div>
-          </div>
-        </div>
+        <div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-content"><div class="flow-step-title">타이밍 커밋</div><div class="flow-step-desc">구체적 · 심리적 데드라인</div></div></div>
         <div class="flow-arrow">↓</div>
-        <div class="flow-step">
-          <div class="flow-step-num">4</div>
-          <div class="flow-step-content">
-            <div class="flow-step-title">기대 설정</div>
-            <div class="flow-step-desc">희망적 · Peak-End Rule</div>
-          </div>
-        </div>
+        <div class="flow-step"><div class="flow-step-num">4</div><div class="flow-step-content"><div class="flow-step-title">기대 설정</div><div class="flow-step-desc">희망적 · Peak-End Rule</div></div></div>
       </div>
-
       <div class="emotion-bar">
         <div class="emotion-bar-label">감정 몰입도 곡선</div>
-        <div class="emotion-bar-track">
-          <span>가볍게</span>
-          <span class="emotion-peak">🔥</span>
-          <span>희망적</span>
-        </div>
+        <div class="emotion-bar-track"><span>가볍게</span><span class="emotion-peak">🔥</span><span>희망적</span></div>
       </div>
     </div>
 
     <div class="theory-card" style="margin-top: 24px;">
       <h3><span class="emoji-icon">📐</span> 설계 원칙 요약</h3>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
-        <div class="ob-item" style="flex-direction: column; align-items: flex-start;">
-          <strong style="font-size: 13px; color: var(--deep-plum);">질문 수</strong>
-          <span style="font-size: 13px; color: var(--text-secondary);">4개 (60초 완료 목표)</span>
-        </div>
-        <div class="ob-item" style="flex-direction: column; align-items: flex-start;">
-          <strong style="font-size: 13px; color: var(--deep-plum);">텍스트 입력</strong>
-          <span style="font-size: 13px; color: var(--text-secondary);">0개 (전부 탭 선택)</span>
-        </div>
-        <div class="ob-item" style="flex-direction: column; align-items: flex-start;">
-          <strong style="font-size: 13px; color: var(--deep-plum);">부정 프레임</strong>
-          <span style="font-size: 13px; color: var(--text-secondary);">0개 (전부 긍정 미래)</span>
-        </div>
-        <div class="ob-item" style="flex-direction: column; align-items: flex-start;">
-          <strong style="font-size: 13px; color: var(--deep-plum);">안전밸브</strong>
-          <span style="font-size: 13px; color: var(--text-secondary);">매 질문 1개 이상</span>
-        </div>
-        <div class="ob-item" style="flex-direction: column; align-items: flex-start;">
-          <strong style="font-size: 13px; color: var(--deep-plum);">데이터 활용</strong>
-          <span style="font-size: 13px; color: var(--text-secondary);">4개 전부 알고리즘 연동 가능</span>
-        </div>
-        <div class="ob-item" style="flex-direction: column; align-items: flex-start;">
-          <strong style="font-size: 13px; color: var(--deep-plum);">감정 착지</strong>
-          <span style="font-size: 13px; color: var(--text-secondary);">희망 → 소유감 → 프로필 동기</span>
-        </div>
+        <div class="ob-item" style="flex-direction: column; align-items: flex-start;"><strong style="font-size: 13px; color: var(--deep-plum);">질문 수</strong><span style="font-size: 13px; color: var(--text-secondary);">4개 (60초 완료 목표)</span></div>
+        <div class="ob-item" style="flex-direction: column; align-items: flex-start;"><strong style="font-size: 13px; color: var(--deep-plum);">텍스트 입력</strong><span style="font-size: 13px; color: var(--text-secondary);">0개 (전부 탭 선택)</span></div>
+        <div class="ob-item" style="flex-direction: column; align-items: flex-start;"><strong style="font-size: 13px; color: var(--deep-plum);">부정 프레임</strong><span style="font-size: 13px; color: var(--text-secondary);">0개 (전부 긍정 미래)</span></div>
+        <div class="ob-item" style="flex-direction: column; align-items: flex-start;"><strong style="font-size: 13px; color: var(--deep-plum);">안전밸브</strong><span style="font-size: 13px; color: var(--text-secondary);">매 질문 1개 이상</span></div>
+        <div class="ob-item" style="flex-direction: column; align-items: flex-start;"><strong style="font-size: 13px; color: var(--deep-plum);">데이터 활용</strong><span style="font-size: 13px; color: var(--text-secondary);">4개 전부 알고리즘 연동 가능</span></div>
+        <div class="ob-item" style="flex-direction: column; align-items: flex-start;"><strong style="font-size: 13px; color: var(--deep-plum);">감정 착지</strong><span style="font-size: 13px; color: var(--text-secondary);">희망 → 소유감 → 프로필 동기</span></div>
       </div>
     </div>
   </div>
@@ -976,10 +735,32 @@ function buildSummary() {
   for (let i = 1; i <= 4; i++) {
     const val = answers[i];
     if (val && labels[i]) {
-      html += `<div class="summary-row"><span class="summary-label">${labels[i].title}</span><span class="summary-value">${labels[i][val] || val}</span></div>`;
+      html += '<div class="summary-row"><span class="summary-label">' + labels[i].title + '</span><span class="summary-value">' + (labels[i][val] || val) + '</span></div>';
     }
   }
   document.getElementById('summaryCard').innerHTML = html;
+}
+
+/* ★ 프로필 만들기 버튼 — alert 대신 인라인 피드백 */
+function handleProfileGo(btn) {
+  btn.classList.add('done');
+  btn.textContent = '✓ 프로필 생성 플로우로 이동합니다';
+}
+
+/* ★ 새로고침 — 전체 프로토타입 초기화 */
+function resetProto() {
+  // 답변 초기화
+  for (const key in answers) delete answers[key];
+  // 선택 상태 초기화
+  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  // 다음 버튼 비활성화
+  document.querySelectorAll('.next-btn').forEach(b => b.classList.remove('enabled'));
+  // 프로필 버튼 복원
+  const pgb = document.getElementById('profileGoBtn');
+  if (pgb) { pgb.classList.remove('done'); pgb.textContent = '프로필 만들기 →'; }
+  // 화면 전환
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'exit'));
+  setTimeout(() => { document.getElementById('screen-0').classList.add('active'); }, 80);
 }
 </script>
 </body>
