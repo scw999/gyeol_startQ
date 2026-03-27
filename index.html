@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>결하다 — 온보딩 프라이밍 설계서</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --lavender: #B8A9E8;
+  --lavender-light: #E8E0FF;
+  --lavender-bg: #F5F0FF;
+  --rose-gold: #E8B4B8;
+  --rose-gold-light: #FFE4E8;
+  --warm-ivory: #FFF8F0;
+  --deep-plum: #4A3060;
+  --text-primary: #2D2040;
+  --text-secondary: #7A6B8A;
+  --text-hint: #A89BB8;
+  --card-shadow: 0 8px 32px rgba(74, 48, 96, 0.08);
+  --glow: 0 0 40px rgba(184, 169, 232, 0.3);
+  --green-soft: #E8F5E9;
+  --green-text: #2E7D32;
+  --amber-soft: #FFF8E1;
+  --amber-text: #F57F17;
+  --red-soft: #FFEBEE;
+  --red-text: #C62828;
+  --blue-soft: #E3F2FD;
+  --blue-text: #1565C0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #F8F5FF;
+  color: var(--text-primary);
+}
+
+/* ── TAB NAVIGATION ── */
+.tab-bar {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: rgba(248, 245, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(184, 169, 232, 0.15);
+  display: flex;
+  justify-content: center;
+  gap: 0;
+}
+.tab-btn {
+  padding: 16px 28px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-hint);
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.3s;
+}
+.tab-btn.active { color: var(--deep-plum); }
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 40px; height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--lavender), var(--rose-gold));
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ═══════════════════════════════════════ */
+/* ── PROTOTYPE TAB                     ── */
+/* ═══════════════════════════════════════ */
+.proto-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 32px 16px 60px;
+}
+.phone-frame {
+  width: 390px;
+  height: 780px;
+  border-radius: 40px;
+  background: var(--warm-ivory);
+  box-shadow: 0 20px 60px rgba(74, 48, 96, 0.12), 0 0 0 8px #E8E0FF;
+  position: relative;
+  overflow: hidden;
+}
+.phone-notch {
+  position: absolute;
+  top: 0; left: 50%; transform: translateX(-50%);
+  width: 140px; height: 28px;
+  background: #2D2040;
+  border-radius: 0 0 18px 18px;
+  z-index: 10;
+}
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  pointer-events: none;
+}
+.bg-orb.a { width: 260px; height: 260px; background: var(--lavender); top: -60px; right: -40px; animation: float-a 8s ease-in-out infinite; }
+.bg-orb.b { width: 220px; height: 220px; background: var(--rose-gold); bottom: -30px; left: -60px; animation: float-b 10s ease-in-out infinite; }
+@keyframes float-a { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(-20px,30px); } }
+@keyframes float-b { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(15px,-20px); } }
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 26px;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1);
+  pointer-events: none;
+  z-index: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.screen.active { opacity: 1; transform: translateY(0); pointer-events: all; }
+.screen.exit { opacity: 0; transform: translateY(-25px); pointer-events: none; }
+
+/* progress */
+.progress-wrap {
+  padding-top: 40px;
+  padding-bottom: 6px;
+  display: flex; gap: 5px; flex-shrink: 0;
+}
+.progress-dot { flex: 1; height: 3px; border-radius: 2px; background: rgba(184,169,232,0.18); transition: background 0.5s; }
+.progress-dot.filled { background: var(--lavender); }
+.progress-dot.current { background: linear-gradient(90deg, var(--lavender), var(--rose-gold)); }
+
+.screen-header { padding-top: 22px; flex-shrink: 0; }
+.step-label { font-size: 11px; font-weight: 600; color: var(--lavender); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+.question { font-family: 'Noto Serif KR', serif; font-size: 23px; font-weight: 700; line-height: 1.5; color: var(--deep-plum); word-break: keep-all; }
+.question em { font-style: normal; background: linear-gradient(120deg, var(--lavender), var(--rose-gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.sub-text { font-size: 13px; color: var(--text-secondary); margin-top: 8px; line-height: 1.6; }
+
+/* options */
+.options { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; flex-shrink: 0; }
+.option-card {
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(10px);
+  border: 2px solid transparent;
+  border-radius: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+  display: flex; align-items: center; gap: 12px;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.option-card:hover { border-color: var(--lavender); transform: translateY(-1px); box-shadow: var(--card-shadow); }
+.option-card:active { transform: scale(0.98); }
+.option-card.selected { border-color: var(--lavender); background: linear-gradient(135deg, rgba(184,169,232,0.1), rgba(232,180,184,0.08)); box-shadow: var(--glow); }
+.option-icon { font-size: 24px; flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: var(--lavender-bg); transition: background 0.3s; }
+.option-card.selected .option-icon { background: linear-gradient(135deg, var(--lavender), var(--rose-gold)); }
+.option-label { font-size: 14px; font-weight: 500; color: var(--text-primary); line-height: 1.3; }
+.option-desc { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
+.option-card.selected .option-label { color: var(--deep-plum); font-weight: 700; }
+.check-ring { width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(184,169,232,0.25); margin-left: auto; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+.option-card.selected .check-ring { border-color: var(--lavender); background: var(--lavender); }
+.check-ring::after { content: '✓'; font-size: 11px; color: white; opacity: 0; transition: opacity 0.2s; }
+.option-card.selected .check-ring::after { opacity: 1; }
+
+.bottom-area { margin-top: auto; padding: 16px 0 24px; flex-shrink: 0; }
+.next-btn {
+  width: 100%; height: 50px; border: none; border-radius: 14px;
+  font-family: 'Noto Sans KR', sans-serif; font-size: 15px; font-weight: 700; color: white; cursor: pointer;
+  background: linear-gradient(135deg, var(--lavender), var(--rose-gold));
+  box-shadow: 0 4px 16px rgba(184,169,232,0.25);
+  transition: all 0.3s; opacity: 0.35; pointer-events: none;
+}
+.next-btn.enabled { opacity: 1; pointer-events: all; }
+.next-btn.enabled:hover { transform: translateY(-1px); }
+.next-btn.enabled:active { transform: scale(0.98); }
+
+/* welcome */
+.welcome-screen { justify-content: center; align-items: center; text-align: center; }
+.welcome-logo { font-family: 'Noto Serif KR', serif; font-size: 38px; font-weight: 700; background: linear-gradient(135deg, var(--deep-plum), var(--lavender)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 12px; animation: logo-in 1s cubic-bezier(0.16,1,0.3,1) both; }
+.welcome-sub { font-size: 14px; color: var(--text-secondary); line-height: 1.7; animation: fade-up 1s 0.3s cubic-bezier(0.16,1,0.3,1) both; word-break: keep-all; }
+.welcome-sub strong { color: var(--deep-plum); font-weight: 600; }
+.welcome-start-btn { margin-top: 40px; width: 180px; height: 48px; border: none; border-radius: 24px; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; font-weight: 600; color: white; cursor: pointer; background: linear-gradient(135deg, var(--deep-plum), var(--lavender)); box-shadow: 0 4px 20px rgba(74,48,96,0.2); transition: all 0.3s; animation: fade-up 1s 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+.welcome-start-btn:hover { transform: translateY(-2px); }
+@keyframes logo-in { from { opacity: 0; transform: translateY(16px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* complete */
+.complete-screen { justify-content: center; align-items: center; text-align: center; }
+.complete-ring { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--lavender-light), var(--rose-gold-light)); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 20px; animation: pulse-ring 2s ease-in-out infinite; }
+@keyframes pulse-ring { 0%,100% { box-shadow: 0 0 0 0 rgba(184,169,232,0.25); } 50% { box-shadow: 0 0 0 16px rgba(184,169,232,0); } }
+.complete-title { font-family: 'Noto Serif KR', serif; font-size: 22px; font-weight: 700; color: var(--deep-plum); margin-bottom: 10px; }
+.complete-msg { font-size: 13px; color: var(--text-secondary); line-height: 1.7; word-break: keep-all; }
+.complete-msg strong { color: var(--deep-plum); }
+.summary-card { margin-top: 24px; background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); border-radius: 14px; padding: 16px; width: 100%; text-align: left; }
+.summary-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid rgba(184,169,232,0.1); font-size: 12px; }
+.summary-row:last-child { border-bottom: none; }
+.summary-label { color: var(--text-hint); }
+.summary-value { color: var(--deep-plum); font-weight: 600; }
+
+/* ═══════════════════════════════════════ */
+/* ── ANALYSIS TAB                      ── */
+/* ═══════════════════════════════════════ */
+.analysis-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+.doc-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.doc-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--deep-plum);
+  background: var(--lavender-light);
+  margin-bottom: 16px;
+}
+.doc-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--deep-plum);
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+.doc-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Theory blocks */
+.theory-section {
+  margin-bottom: 40px;
+}
+.theory-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--lavender);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.theory-card {
+  background: white;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 4px 24px rgba(74,48,96,0.06);
+  border: 1px solid rgba(184,169,232,0.1);
+}
+.theory-card h3 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--deep-plum);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.theory-card h3 .emoji-icon {
+  font-size: 28px;
+}
+.theory-card p, .theory-card li {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  word-break: keep-all;
+}
+.theory-card p + p { margin-top: 12px; }
+.theory-card strong { color: var(--text-primary); font-weight: 600; }
+.theory-card em { font-style: normal; color: var(--deep-plum); font-weight: 600; }
+
+/* evidence box */
+.evidence-box {
+  margin-top: 16px;
+  background: var(--lavender-bg);
+  border-radius: 12px;
+  padding: 16px 18px;
+  border-left: 3px solid var(--lavender);
+}
+.evidence-box .ev-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--deep-plum);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.evidence-box p {
+  font-size: 13px !important;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* risk box */
+.risk-box {
+  margin-top: 16px;
+  background: var(--amber-soft);
+  border-radius: 12px;
+  padding: 16px 18px;
+  border-left: 3px solid #FFB74D;
+}
+.risk-box .risk-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--amber-text);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.risk-box p {
+  font-size: 13px !important;
+  color: #795548;
+  line-height: 1.7;
+}
+
+/* solution box */
+.solution-box {
+  margin-top: 16px;
+  background: var(--green-soft);
+  border-radius: 12px;
+  padding: 16px 18px;
+  border-left: 3px solid #66BB6A;
+}
+.solution-box .sol-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green-text);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.solution-box p {
+  font-size: 13px !important;
+  color: #33691E;
+  line-height: 1.7;
+}
+
+/* step analysis cards */
+.step-analysis {
+  margin-bottom: 32px;
+}
+.step-num-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, var(--deep-plum), var(--lavender));
+  margin-bottom: 14px;
+}
+.step-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(74,48,96,0.06);
+  border: 1px solid rgba(184,169,232,0.1);
+}
+.step-card-header {
+  padding: 24px 28px 16px;
+  border-bottom: 1px solid rgba(184,169,232,0.08);
+}
+.step-card-header h3 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--deep-plum);
+  margin-bottom: 6px;
+}
+.step-card-header .q-preview {
+  font-size: 14px;
+  color: var(--text-hint);
+  font-style: italic;
+}
+.step-card-body { padding: 20px 28px 24px; }
+.step-card-body p { font-size: 14px; color: var(--text-secondary); line-height: 1.8; word-break: keep-all; }
+.step-card-body p + p { margin-top: 10px; }
+.step-card-body strong { color: var(--text-primary); }
+
+/* tag system */
+.tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.tag { display: inline-block; padding: 4px 11px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.tag.green { background: var(--green-soft); color: var(--green-text); }
+.tag.amber { background: var(--amber-soft); color: var(--amber-text); }
+.tag.purple { background: var(--lavender-bg); color: var(--deep-plum); }
+.tag.blue { background: var(--blue-soft); color: var(--blue-text); }
+.tag.red { background: var(--red-soft); color: var(--red-text); }
+
+/* option breakdown */
+.option-breakdown {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ob-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #FAFAFA;
+  border: 1px solid #F0EDF5;
+}
+.ob-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.ob-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+.ob-text strong { color: var(--text-primary); }
+
+/* flow diagram */
+.flow-diagram {
+  margin-top: 32px;
+  background: white;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 4px 24px rgba(74,48,96,0.06);
+  border: 1px solid rgba(184,169,232,0.1);
+}
+.flow-diagram h3 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--deep-plum);
+  margin-bottom: 20px;
+  text-align: center;
+}
+.flow-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  align-items: center;
+}
+.flow-step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 460px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(184,169,232,0.06), rgba(232,180,184,0.04));
+}
+.flow-step-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--lavender), var(--rose-gold));
+  color: white; font-weight: 700; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.flow-step-content {
+  flex: 1;
+}
+.flow-step-title { font-size: 14px; font-weight: 700; color: var(--deep-plum); }
+.flow-step-desc { font-size: 12px; color: var(--text-hint); margin-top: 2px; }
+.flow-arrow {
+  text-align: center;
+  color: var(--lavender);
+  font-size: 18px;
+  padding: 4px 0;
+}
+.emotion-bar {
+  margin-top: 20px;
+  background: #FAFAFA;
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+.emotion-bar-label { font-size: 12px; font-weight: 600; color: var(--text-hint); margin-bottom: 10px; }
+.emotion-bar-track {
+  height: 28px;
+  border-radius: 14px;
+  background: linear-gradient(90deg,
+    rgba(184,169,232,0.15) 0%,
+    rgba(184,169,232,0.5) 25%,
+    rgba(184,169,232,0.8) 50%,
+    rgba(232,180,184,0.7) 75%,
+    rgba(232,180,184,0.4) 100%
+  );
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--deep-plum);
+}
+.emotion-peak {
+  position: absolute;
+  top: -6px;
+  left: 48%;
+  font-size: 16px;
+}
+
+/* divider */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--lavender), transparent);
+  margin: 48px 0;
+  opacity: 0.3;
+}
+</style>
+</head>
+<body>
+
+<!-- ── TAB BAR ── -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('proto')">📱 프로토타입</button>
+  <button class="tab-btn" onclick="switchTab('analysis')">🧠 설계 근거 & 분석</button>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ── TAB 1: PROTOTYPE                      ── -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="tab-panel active" id="tab-proto">
+<div class="proto-wrap">
+<div class="phone-frame">
+  <div class="phone-notch"></div>
+  <div class="bg-orb a"></div>
+  <div class="bg-orb b"></div>
+
+  <!-- Screen 0 -->
+  <div class="screen welcome-screen active" id="screen-0">
+    <div class="welcome-logo">결하다</div>
+    <p class="welcome-sub">프로필을 만들기 전에,<br><strong>당신의 마음</strong>을 먼저 들려주세요.<br>짧은 네 가지 질문이에요.</p>
+    <button class="welcome-start-btn" onclick="goTo(1)">시작하기</button>
+  </div>
+
+  <!-- Screen 1 -->
+  <div class="screen" id="screen-1">
+    <div class="progress-wrap"><div class="progress-dot current"></div><div class="progress-dot"></div><div class="progress-dot"></div><div class="progress-dot"></div></div>
+    <div class="screen-header">
+      <div class="step-label">STEP 1 · 마음 확인</div>
+      <h1 class="question">지금, <em>결혼</em>이<br>하고 싶으신가요?</h1>
+      <p class="sub-text">정답은 없어요. 솔직한 마음이면 충분합니다.</p>
+    </div>
+    <div class="options" data-step="1">
+      <div class="option-card" data-value="확신" onclick="select(this)"><div class="option-icon">💍</div><div><div class="option-label">네, 진심으로 하고 싶어요</div></div><div class="check-ring"></div></div>
+      <div class="option-card" data-value="탐색" onclick="select(this)"><div class="option-icon">🌱</div><div><div class="option-label">좋은 사람이 있다면요</div></div><div class="check-ring"></div></div>
+      <div class="option-card" data-value="고민" onclick="select(this)"><div class="option-icon">🤔</div><div><div class="option-label">아직 고민 중이에요</div></div><div class="check-ring"></div></div>
+      <div class="option-card" data-value="확인" onclick="select(this)"><div class="option-icon">🔍</div><div><div class="option-label">일단 어떤 서비스인지 보고 싶어요</div></div><div class="check-ring"></div></div>
+    </div>
+    <div class="bottom-area"><button class="next-btn" id="btn-1" onclick="goTo(2)">다음</button></div>
+  </div>
+
+  <!-- Screen 2 -->
+  <div class="screen" id="screen-2">
+    <div class="progress-wrap"><div class="progress-dot filled"></div><div class="progress-dot current"></div><div class="progress-dot"></div><div class="progress-dot"></div></div>
+    <div class="screen-header">
+      <div class="step-label">STEP 2 · 이유</div>
+      <h1 class="question"><em>결혼</em>을 떠올리면<br>어떤 마음이 드세요?</h1>
+      <p class="sub-text">가장 가까운 감정을 골라주세요.</p>
+    </div>
+    <div class="options" data-step="2">
+      <div class="option-card" data-value="안정" onclick="select(this)"><div class="option-icon">🏠</div><div><div class="option-label">함께 쌓아가는 안정된 일상</div><div class="option-desc">서로의 하루 끝에 있어주는 사람</div></div><div class="check-ring"></div></div>
+      <div class="option-card" data-value="성장" onclick="select(this)"><div class="option-icon">🌿</div><div><div class="option-label">서로를 성장시키는 동반자</div><div class="option-desc">혼자보다 더 나은 내가 되는 관계</div></div><div class="check-ring"></div></div>
+      <div class="option-card" data-value="가족" onclick="select(this)"><div class="option-icon">👨‍👩‍👧</div><div><div class="option-label">따뜻한 가족을 만들고 싶어요</div><div class="option-desc">웃음이 가득한 우리만의 가정</div></div><div class="check-ring"></div></div>
+      <div class="option-card" data-value="사랑" onclick="select(this)"><div class="option-icon">💜</div><div><div class="option-label">깊이 사랑하는 사람과 평생</div><div class="option-desc">진짜 나를 알아주는 사람</div></div><div class="check-ring"></div></div>
+    </div>
+    <div class="bottom-area"><button class="next-btn" id="btn-2" onclick="goTo(3)">다음</button></div>
+  </div>
+
+  <!-- Screen 3 -->
+  <div class="screen" id="screen-3">
+    <div class="progress-wrap"><div class="progress-dot filled"></div><div class="progress-dot filled"></div><div class="progress-dot current"></div><div class="progress-dot"></div></div>
+    <div class="screen-header">
+      <div class="step-label">STEP 3 · 타이밍</div>
+      <h1 class="question">언제쯤 <em>결혼</em>하고<br>싶으세요?</h1>
+      <p class="sub-text">대략적인 마음의 시계를 알려주세요.</p>
+    </div>
+    <div class="options" data-step="3">
+      <div class="option-card" data-value="1년내" onclick="select(this)"><div class="option-icon">⚡</div><div><div class="option-label">1년 안에 하고 싶어요</div><div class="option-desc">진지하게 준비 중이에요</div></div><div class="check-ring"></div></div>
+      <div class="option-card" data-value="2-3년" onclick="select(this)"><div class="option-icon">🗓️</div><div><div class="option-label">2~3년 안에요</div><div class="option-desc">좋은 사람을 천천히 만나고 싶어요</div></div><div class="check-ring"></div></div>
+      <div class="option-card" data-value="여유" onclick="select(this)"><div class="option-icon">🍃</div><div><div class="option-label">시기보다 사람이 중요해요</div><div class="option-desc">만남 자체에 의미를 두고 싶어요</div></div><div class="check-ring"></div></div>
+    </div>
+    <div class="bottom-area"><button class="next-btn" id="btn-3" onclick="goTo(4)">다음</button></div>
+  </div>
+
+  <!-- Screen 4 -->
+  <div class="screen" id="screen-4">
+    <div class="progress-wrap"><div class="progress-dot filled"></div><div class="progress-dot filled"></div><div class="progress-dot filled"></div><div class="progress-dot current"></div></div>
+    <div class="screen-header">
+      <div class="step-label">STEP 4 · 기대</div>
+      <h1 class="question">결하다에서의 <em>첫 만남</em>,<br>어땠으면 좋겠어요?</h1>
+      <p class="sub-text">만남의 온도를 맞춰드릴게요.</p>
+    </div>
+    <div class="options" data-step="4">
+      <div class="option-card" data-value="설렘" onclick="select(this)"><div class="option-icon">✨</div><div><div class="option-label">설레는 두근거림</div><div class="option-desc">첫눈에 끌리는 감정이 중요해요</div></div><div class="check-ring"></div></div>
+      <div class="option-card" data-value="편안" onclick="select(this)"><div class="option-icon">☕</div><div><div class="option-label">편안한 대화</div><div class="option-desc">오래 알던 사이처럼 자연스러운</div></div><div class="check-ring"></div></div>
+      <div class="option-card" data-value="깊이" onclick="select(this)"><div class="option-icon">🎯</div><div><div class="option-label">서로의 진심을 확인하는 깊이</div><div class="option-desc">가치관과 방향이 맞는지부터</div></div><div class="check-ring"></div></div>
+      <div class="option-card" data-value="신뢰" onclick="select(this)"><div class="option-icon">🤝</div><div><div class="option-label">검증된 신뢰감</div><div class="option-desc">믿을 수 있는 사람이라는 확신</div></div><div class="check-ring"></div></div>
+    </div>
+    <div class="bottom-area"><button class="next-btn" id="btn-4" onclick="goTo(5)">프로필 만들러 가기 →</button></div>
+  </div>
+
+  <!-- Screen 5 -->
+  <div class="screen complete-screen" id="screen-5">
+    <div class="complete-ring">💜</div>
+    <div class="complete-title">마음을 들었어요</div>
+    <p class="complete-msg"><strong>당신</strong>의 마음에 맞는<br>매칭을 준비할게요.<br><br>이제 <strong>프로필</strong>을 만들어볼까요?</p>
+    <div class="summary-card" id="summaryCard"></div>
+    <div class="bottom-area" style="width:100%"><button class="next-btn enabled" onclick="alert('→ 프로필 생성 플로우로 이동')">프로필 만들기 →</button></div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ── TAB 2: ANALYSIS                       ── -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-analysis">
+<div class="analysis-container">
+
+  <div class="doc-header">
+    <div class="doc-badge">INTERNAL · 결하다 UX 전략</div>
+    <h1 class="doc-title">온보딩 프라이밍 질문<br>설계 근거서</h1>
+    <p class="doc-subtitle">첫 화면에서 "결혼 동기"를 먼저 묻는 것의<br>심리학적 근거, 리스크, 그리고 각 질문의 설계 의도</p>
+  </div>
+
+  <!-- ── SECTION 1: 핵심 이론 ── -->
+  <div class="theory-section">
+    <div class="theory-section-label">핵심 이론 근거</div>
+
+    <div class="theory-card" style="margin-bottom: 20px;">
+      <h3><span class="emoji-icon">🧠</span> 자기설득 효과 (Self-Persuasion)</h3>
+      <p>"왜 결혼하고 싶어?"라고 스스로 답하는 순간, 외부 설득이 아니라 <em>본인이 자신을 설득하게 됩니다.</em> 외부에서 "결혼하세요!"라고 말하면 저항이 생기지만, 자기 손으로 "네, 하고 싶어요"를 터치하면 <strong>그 선택에 일관되게 행동하려는 심리</strong>가 작동합니다.</p>
+      <p>이것은 Robert Cialdini의 <em>일관성 원칙(Commitment & Consistency)</em>과 직결됩니다. 사람은 자신이 한 번 공개적으로 표현한 입장을 뒤집기 어려워합니다. 가입 첫 화면에서 결혼 의지를 직접 "선택"하게 하면, 이후 프로필 작성이나 결제 단계에서 이탈률이 낮아집니다.</p>
+      <div class="evidence-box">
+        <div class="ev-label">📚 근거</div>
+        <p><strong>Cialdini, R. (2006).</strong> <em>Influence: The Psychology of Persuasion.</em> — 일관성 원칙: 작은 커밋(선택, 서명, 체크)이 이후 큰 행동(결제, 장기 이용)으로 이어지는 "foot-in-the-door" 효과. Freedman & Fraser(1966)의 실험에서 작은 요청 수락 후 큰 요청 수락률이 2배 이상 증가함을 입증.</p>
+        <p><strong>Aronson, E. (1999).</strong> — 자기설득은 외부 설득 대비 태도 변화의 지속성이 유의미하게 높음. 직접 주장을 만들어낸 사람이 단순히 설득 메시지를 들은 사람보다 더 강하게 그 입장을 유지.</p>
+      </div>
+    </div>
+
+    <div class="theory-card" style="margin-bottom: 20px;">
+      <h3><span class="emoji-icon">💡</span> 감정 앵커링 (Emotional Anchoring)</h3>
+      <p>프로필 입력이나 사진 업로드 같은 <strong>"작업"으로 시작하면 뇌가 "업무 모드"에 들어갑니다.</strong> 이력서를 쓰는 것처럼 느껴지면 감정적 연결이 끊기고, 앱이 "취업 사이트"와 같은 범주로 분류됩니다.</p>
+      <p>반면 <em>"결혼하면 어떤 장면이 떠오르세요?"</em>로 시작하면 감정 모드로 진입합니다. 뇌의 변연계(감정 처리)가 먼저 활성화되고, 이 앱을 <strong>"내 결혼 이야기의 시작점"</strong>으로 각인시킵니다. 첫 인상이 형성되는 이 순간의 감정 톤이 이후 전체 서비스 경험을 지배합니다.</p>
+      <div class="evidence-box">
+        <div class="ev-label">📚 근거</div>
+        <p><strong>Kahneman, D. (2011).</strong> <em>Thinking, Fast and Slow.</em> — 시스템 1(빠르고 감정적)이 먼저 판단한 후 시스템 2(느리고 논리적)가 합리화함. 첫 화면에서 감정 시스템을 활성화하면 이후 논리적 판단(가격, 절차 등)에서도 긍정적 프레임이 유지됨.</p>
+        <p><strong>Tversky & Kahneman (1974).</strong> — 앵커링 효과: 처음 접한 정보(여기서는 감정적 프레임)가 이후 판단의 기준점으로 작동. 첫 질문이 "결혼의 기대감"이면 이후 모든 UX가 그 프레임 안에서 해석됨.</p>
+      </div>
+    </div>
+
+    <div class="theory-card">
+      <h3><span class="emoji-icon">🎁</span> 소유 효과 (Endowment Effect)</h3>
+      <p>4개 질문에 답하고 마지막에 <strong>나의 선택 요약 카드</strong>를 보여주면, 사용자는 "나만의 결혼 프로필이 이미 시작됐다"고 느낍니다. 아직 프로필 하나 안 만들었지만, 이미 투자한 시간과 선택이 존재하므로 <em>이탈 비용이 심리적으로 증가</em>합니다.</p>
+      <div class="evidence-box">
+        <div class="ev-label">📚 근거</div>
+        <p><strong>Thaler, R. (1980).</strong> — 사람은 자신이 소유한(또는 소유했다고 느끼는) 것에 더 높은 가치를 부여. 4개 선택의 요약 카드는 "소유물"로 인식되어 가입 중단 = 손실로 체감.</p>
+        <p><strong>Sunk Cost Fallacy</strong> — 이미 감정을 투자한 프로세스를 포기하는 것은 인지적으로 불편. 질문이 감정적일수록 이 효과가 강함.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ── SECTION 2: 리스크 분석 ── -->
+  <div class="theory-section">
+    <div class="theory-section-label">리스크 분석 & 해결</div>
+    <div class="theory-card">
+      <h3><span class="emoji-icon">⚠️</span> 이탈 마찰 리스크</h3>
+
+      <div class="risk-box">
+        <div class="risk-label">🔴 리스크</div>
+        <p>질문이 무겁거나 개수가 많으면 <strong>"가입도 안 했는데 왜 이렇게 물어봐?"</strong>라는 반감 발생. 특히 "결혼 실패 경험이 있나요?"같은 민감한 질문은 즉시 이탈 유발. 한국 유저는 개인 정보 노출에 예민하고, 결혼 관련 질문은 압박으로 느끼기 쉬움.</p>
+      </div>
+
+      <div class="solution-box" style="margin-top: 12px;">
+        <div class="sol-label">✅ 해결 설계</div>
+        <p><strong>1) 질문 개수 3~4개 제한.</strong> 인지심리학의 "Miller's Law" (7±2)보다 훨씬 적게. 60초 안에 끝나야 함.</p>
+        <p><strong>2) 텍스트 입력 제로.</strong> 전부 탭 한 번으로 선택 가능. 키보드가 올라오는 순간 이탈률이 급증(모바일 폼 UX 연구 — Baymard Institute, 2022).</p>
+        <p><strong>3) 안전밸브 선택지.</strong> 각 질문마다 "아직 고민 중이에요", "시기보다 사람이 중요해요" 같은 부담 없는 옵션을 반드시 포함. 이것이 압박감을 제거하면서도 일관성 원칙은 여전히 작동하게 만듦.</p>
+        <p><strong>4) 부정적 프레임 제거.</strong> "이혼 경험", "실패", "불안" 같은 단어 금지. 모든 선택지가 긍정적 미래만 포함.</p>
+      </div>
+
+      <div class="risk-box" style="margin-top: 12px;">
+        <div class="risk-label">🟡 부차 리스크: "세뇌 당하는 느낌"</div>
+        <p>지나치게 유도적인 질문은 영리한 사용자에게 <strong>조작감</strong>을 줄 수 있음. "이거 나를 컨트롤하려고 하는 거 아니야?"</p>
+      </div>
+
+      <div class="solution-box" style="margin-top: 12px;">
+        <div class="sol-label">✅ 해결 설계</div>
+        <p>질문을 <strong>"당신을 이해하기 위한 질문"</strong>으로 프레이밍. "프로필을 만들기 전에 당신의 마음을 먼저 들려주세요"라는 도입 문구가 이 역할을 함. 유도가 아니라 <em>배려</em>로 인식되도록 톤 설계.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ── SECTION 3: 각 질문 분석 ── -->
+  <div class="theory-section">
+    <div class="theory-section-label">질문별 설계 분석</div>
+
+    <!-- STEP 1 -->
+    <div class="step-analysis">
+      <div class="step-num-badge">STEP 1 · 마음 확인</div>
+      <div class="step-card">
+        <div class="step-card-header">
+          <h3>지금, 결혼이 하고 싶으신가요?</h3>
+          <div class="q-preview">"정답은 없어요. 솔직한 마음이면 충분합니다."</div>
+        </div>
+        <div class="step-card-body">
+          <div class="tag-row">
+            <span class="tag green">자기설득 트리거</span>
+            <span class="tag purple">일관성 원칙</span>
+            <span class="tag blue">저마찰 진입</span>
+          </div>
+          <p><strong>설계 의도:</strong> 가장 먼저 "결혼 의지"를 본인 입으로(손으로) 선언하게 합니다. "네, 하고 싶어요"를 터치한 순간 Cialdini의 <em>Commitment Effect</em>가 발동합니다. 이 사람은 이제 자기가 선택한 입장과 일관되게 행동하려 합니다.</p>
+          <p><strong>왜 첫 질문인가:</strong> 가장 가볍고, 대부분이 "Yes"에 해당하는 질문으로 시작해야 <em>foot-in-the-door</em> 효과가 극대화됩니다. 첫 번째 "Yes"가 이후 모든 "Yes"의 문턱을 낮춥니다.</p>
+
+          <div class="option-breakdown">
+            <div class="ob-item"><div class="ob-icon">💍</div><div class="ob-text"><strong>"네, 진심으로 하고 싶어요"</strong> — 가장 강한 커밋. 이 선택자의 가입 완료율과 유료 전환율이 가장 높을 것으로 예측.</div></div>
+            <div class="ob-item"><div class="ob-icon">🌱</div><div class="ob-text"><strong>"좋은 사람이 있다면요"</strong> — 조건부 커밋. 앱의 매칭 품질이 중요. "우리가 그 좋은 사람을 찾아드리겠다"는 후속 메시지와 연결.</div></div>
+            <div class="ob-item"><div class="ob-icon">🤔</div><div class="ob-text"><strong>"아직 고민 중이에요"</strong> — 안전밸브. 이 선택이 없으면 "결혼 안 하고 싶은 사람은 여기 없나?"라는 반감이 생김. 이탈 방지 역할.</div></div>
+            <div class="ob-item"><div class="ob-icon">🔍</div><div class="ob-text"><strong>"서비스 확인"</strong> — 서비스 탐색자 수용. 이 사람도 24문항 심리 검사까지 도달하면 상당수가 전환됨. 거절이 아니라 관심.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-analysis">
+      <div class="step-num-badge">STEP 2 · 감정 앵커링 (핵심)</div>
+      <div class="step-card">
+        <div class="step-card-header">
+          <h3>결혼을 떠올리면 어떤 마음이 드세요?</h3>
+          <div class="q-preview">"가장 가까운 감정을 골라주세요."</div>
+        </div>
+        <div class="step-card-body">
+          <div class="tag-row">
+            <span class="tag green">감정 앵커링</span>
+            <span class="tag green">자기설득 극대화</span>
+            <span class="tag red">핵심 세뇌 구간</span>
+            <span class="tag purple">긍정 프레이밍</span>
+          </div>
+          <p><strong>이 질문이 전체 흐름의 핵심입니다.</strong></p>
+          <p><strong>"왜 결혼하고 싶어요?"를 쓰지 않는 이유:</strong> "왜"는 논리적 정당화를 요구합니다. 뇌의 전전두엽(논리 처리)이 활성화되면 방어 기제가 켜지고 "굳이 왜?"라는 역질문이 올라옵니다. 반면 <em>"어떤 마음이 드세요?"</em>는 감정을 묻습니다. 변연계(감정 처리)가 활성화되고, 사용자는 자연스럽게 <strong>결혼에 대한 긍정적 상상</strong>을 시작합니다.</p>
+          <p><strong>선택지가 전부 긍정적 미래 이미지인 이유:</strong> "불안", "부모님 압박", "나이 걱정" 같은 현실적 동기는 의도적으로 배제했습니다. 사용자가 어떤 것을 골라도 "아, 결혼이란 좋은 거구나"라는 방향으로 자기설득이 일어나도록 설계되어 있습니다. <em>이것이 가장 강한 세뇌 포인트입니다.</em></p>
+
+          <div class="option-breakdown">
+            <div class="ob-item"><div class="ob-icon">🏠</div><div class="ob-text"><strong>"함께 쌓아가는 안정된 일상"</strong> — 안정 지향. 애착 유형 중 안정형과 상관. 매칭 시 생활 패턴 일치도 가중치 상향 가능.</div></div>
+            <div class="ob-item"><div class="ob-icon">🌿</div><div class="ob-text"><strong>"서로를 성장시키는 동반자"</strong> — 성장 지향. 지적 호기심, 목표 지향적. 커리어·취미 공유 가중치 상향.</div></div>
+            <div class="ob-item"><div class="ob-icon">👨‍👩‍👧</div><div class="ob-text"><strong>"따뜻한 가족을 만들고 싶어요"</strong> — 가족 지향. 자녀 계획, 부모 관계 등이 매칭의 핵심 변수가 됨을 암시.</div></div>
+            <div class="ob-item"><div class="ob-icon">💜</div><div class="ob-text"><strong>"깊이 사랑하는 사람과 평생"</strong> — 로맨스 지향. 감정적 교감, 깊은 대화를 중시. 내면 호환성 가중치 극대화.</div></div>
+          </div>
+
+          <div class="evidence-box" style="margin-top: 16px;">
+            <div class="ev-label">🔬 알고리즘 연동 가능성</div>
+            <p>이 답변은 24문항 심리 검사 이전에 수집되는 "결혼 가치관 시드"로 활용 가능. Big Five 분석과 교차하면 매칭 정밀도를 높이는 <strong>프라이어(prior)</strong>로 작용합니다. 예: "안정" 선택 + 성실성 상위 → 안정형 매칭 타입 가중.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-analysis">
+      <div class="step-num-badge">STEP 3 · 타이밍 커밋</div>
+      <div class="step-card">
+        <div class="step-card-header">
+          <h3>언제쯤 결혼하고 싶으세요?</h3>
+          <div class="q-preview">"대략적인 마음의 시계를 알려주세요."</div>
+        </div>
+        <div class="step-card-body">
+          <div class="tag-row">
+            <span class="tag green">데드라인 효과</span>
+            <span class="tag blue">긴급도 데이터</span>
+            <span class="tag amber">이탈 리스크 주의</span>
+          </div>
+          <p><strong>설계 의도:</strong> 시기를 선택하면 <em>심리적 데드라인</em>이 생깁니다. "1년 안에"를 고른 사람은 이 앱을 "빨리 결과를 내야 하는 도구"로 인식하게 되고, 유료 전환율이 가장 높을 것으로 예측됩니다.</p>
+          <p><strong>"시기보다 사람이 중요해요"가 반드시 필요한 이유:</strong> 시기를 묻는 것 자체가 "결혼은 빨리 해야 한다"는 압박으로 느껴질 수 있습니다. 이 선택지가 <strong>안전밸브</strong> 역할을 합니다. 동시에, 이것을 선택한 사람도 "나는 결혼에 진지하지만 여유를 가진 사람"으로 자기 정의를 하게 됩니다 — 역시 자기설득.</p>
+
+          <div class="option-breakdown">
+            <div class="ob-item"><div class="ob-icon">⚡</div><div class="ob-text"><strong>"1년 안에"</strong> — 최고 긴급도. 매칭 알고리즘에서 결이음권 전환 넛지 강하게. 첫 매칭 제안까지의 시간도 단축 제공 가능.</div></div>
+            <div class="ob-item"><div class="ob-icon">🗓️</div><div class="ob-text"><strong>"2~3년 안에"</strong> — 중간 긴급도. 정기적인 매칭 알림과 천천히 관계 형성하는 UX로 유도.</div></div>
+            <div class="ob-item"><div class="ob-icon">🍃</div><div class="ob-text"><strong>"시기보다 사람"</strong> — 안전밸브. 이탈 방지 + "나도 결혼에 관심은 있다"를 확인시키는 이중 기능.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step-analysis">
+      <div class="step-num-badge">STEP 4 · 기대 설정</div>
+      <div class="step-card">
+        <div class="step-card-header">
+          <h3>결하다에서의 첫 만남, 어땠으면 좋겠어요?</h3>
+          <div class="q-preview">"만남의 온도를 맞춰드릴게요."</div>
+        </div>
+        <div class="step-card-body">
+          <div class="tag-row">
+            <span class="tag green">맞춤화 신호</span>
+            <span class="tag purple">소속감 형성</span>
+            <span class="tag blue">알고리즘 연동</span>
+          </div>
+          <p><strong>설계 의도:</strong> 마지막 질문은 두 가지 역할을 합니다. 첫째, <strong>"이 앱이 내 취향을 알고 있다"는 느낌</strong>을 줍니다. "만남의 온도를 맞춰드릴게요"라는 문구는 개인화 약속이고, 사용자는 "내 기대에 맞춰준다고? 이건 다른 앱과 다르네"라고 느낍니다.</p>
+          <p>둘째, <strong>실제 매칭 알고리즘에 반영 가능한 데이터</strong>입니다:</p>
+
+          <div class="option-breakdown">
+            <div class="ob-item"><div class="ob-icon">✨</div><div class="ob-text"><strong>"설레는 두근거림"</strong> — 외모/첫인상 가중치 상향. 프로필 사진 품질이 매칭에서 중요한 변수가 됨을 내부적으로 반영.</div></div>
+            <div class="ob-item"><div class="ob-icon">☕</div><div class="ob-text"><strong>"편안한 대화"</strong> — 성격 호환성 가중치 상향. Big Five의 친화성/외향성 유사도에 가중.</div></div>
+            <div class="ob-item"><div class="ob-icon">🎯</div><div class="ob-text"><strong>"서로의 진심"</strong> — 가치관 일치 가중치 상향. 24문항 결과에서 핵심 가치 항목(결혼관, 자녀관, 재정관)의 매칭 비중 확대.</div></div>
+            <div class="ob-item"><div class="ob-icon">🤝</div><div class="ob-text"><strong>"검증된 신뢰감"</strong> — 인증/검증 데이터 가중치 상향. 직장인증, 학력인증이 완료된 유저를 우선 추천.</div></div>
+          </div>
+
+          <div class="evidence-box" style="margin-top: 16px;">
+            <div class="ev-label">💡 심리적 착지 효과</div>
+            <p>마지막 질문을 "기대"로 끝내면 사용자의 뇌는 <strong>희망 상태</strong>에서 온보딩을 마감합니다. "내가 원하는 만남이 실현될 수 있겠다"는 기대가 프로필 작성 동기를 만듭니다. 감정 곡선의 마지막을 긍정으로 닫는 것은 <em>Peak-End Rule</em>(Kahneman)에 의해 전체 경험의 인상을 결정합니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ── SECTION 4: 전체 흐름 ── -->
+  <div class="theory-section">
+    <div class="theory-section-label">전체 흐름 구조</div>
+
+    <div class="flow-diagram">
+      <h3>감정 곡선 설계</h3>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-step-num">1</div>
+          <div class="flow-step-content">
+            <div class="flow-step-title">의지 확인</div>
+            <div class="flow-step-desc">가볍게 · Foot-in-the-door</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">
+          <div class="flow-step-num">2</div>
+          <div class="flow-step-content">
+            <div class="flow-step-title">감정 앵커링 ← 핵심</div>
+            <div class="flow-step-desc">깊게 · 자기설득 극대화</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">
+          <div class="flow-step-num">3</div>
+          <div class="flow-step-content">
+            <div class="flow-step-title">타이밍 커밋</div>
+            <div class="flow-step-desc">구체적 · 심리적 데드라인</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">
+          <div class="flow-step-num">4</div>
+          <div class="flow-step-content">
+            <div class="flow-step-title">기대 설정</div>
+            <div class="flow-step-desc">희망적 · Peak-End Rule</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="emotion-bar">
+        <div class="emotion-bar-label">감정 몰입도 곡선</div>
+        <div class="emotion-bar-track">
+          <span>가볍게</span>
+          <span class="emotion-peak">🔥</span>
+          <span>희망적</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="theory-card" style="margin-top: 24px;">
+      <h3><span class="emoji-icon">📐</span> 설계 원칙 요약</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+        <div class="ob-item" style="flex-direction: column; align-items: flex-start;">
+          <strong style="font-size: 13px; color: var(--deep-plum);">질문 수</strong>
+          <span style="font-size: 13px; color: var(--text-secondary);">4개 (60초 완료 목표)</span>
+        </div>
+        <div class="ob-item" style="flex-direction: column; align-items: flex-start;">
+          <strong style="font-size: 13px; color: var(--deep-plum);">텍스트 입력</strong>
+          <span style="font-size: 13px; color: var(--text-secondary);">0개 (전부 탭 선택)</span>
+        </div>
+        <div class="ob-item" style="flex-direction: column; align-items: flex-start;">
+          <strong style="font-size: 13px; color: var(--deep-plum);">부정 프레임</strong>
+          <span style="font-size: 13px; color: var(--text-secondary);">0개 (전부 긍정 미래)</span>
+        </div>
+        <div class="ob-item" style="flex-direction: column; align-items: flex-start;">
+          <strong style="font-size: 13px; color: var(--deep-plum);">안전밸브</strong>
+          <span style="font-size: 13px; color: var(--text-secondary);">매 질문 1개 이상</span>
+        </div>
+        <div class="ob-item" style="flex-direction: column; align-items: flex-start;">
+          <strong style="font-size: 13px; color: var(--deep-plum);">데이터 활용</strong>
+          <span style="font-size: 13px; color: var(--text-secondary);">4개 전부 알고리즘 연동 가능</span>
+        </div>
+        <div class="ob-item" style="flex-direction: column; align-items: flex-start;">
+          <strong style="font-size: 13px; color: var(--deep-plum);">감정 착지</strong>
+          <span style="font-size: 13px; color: var(--text-secondary);">희망 → 소유감 → 프로필 동기</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ── SECTION 5: 경쟁사 비교 ── -->
+  <div class="theory-section">
+    <div class="theory-section-label">경쟁사 대비 차별점</div>
+    <div class="theory-card">
+      <h3><span class="emoji-icon">⚔️</span> 왜 다른 앱은 이걸 안 하는가</h3>
+      <p><strong>대부분의 매칭 앱</strong>(위드, 글램, 정오의데이트 등)은 가입 첫 화면이 <em>전화번호 인증 → 사진 업로드 → 기본 정보 입력</em>입니다. "업무 모드"로 시작하기 때문에 감정적 연결이 전혀 없습니다.</p>
+      <p><strong>결혼정보회사</strong>(듀오, 가연, 선우 등)는 오프라인 상담에서 이런 질문을 합니다. 하지만 디지털 온보딩에서는 하지 않습니다.</p>
+      <p><strong>비긴즈 BLOOM</strong>은 56문항 심리 검사가 있지만, 이것은 "검사"입니다. 결하다의 4개 프라이밍 질문은 검사가 아니라 <em>"분위기 조성"</em>입니다. 심리 검사 전에 감정을 먼저 열어주는 <strong>프리미엄 워밍업</strong> 역할.</p>
+      <p>결하다가 이걸 하면: <em>"이 앱은 처음부터 다르다"</em>는 첫인상. 이것이 브랜드 슬로건 "결이 맞아야, 결혼도 맞다"와 정확히 연결됩니다.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+/* ── TAB SWITCH ── */
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  if (tab === 'proto') {
+    document.querySelectorAll('.tab-btn')[0].classList.add('active');
+    document.getElementById('tab-proto').classList.add('active');
+  } else {
+    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+    document.getElementById('tab-analysis').classList.add('active');
+  }
+}
+
+/* ── PROTOTYPE LOGIC ── */
+const answers = {};
+
+function select(el) {
+  const parent = el.closest('.options');
+  parent.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const step = parent.dataset.step;
+  answers[step] = el.dataset.value;
+  const btn = document.getElementById('btn-' + step);
+  if (btn) btn.classList.add('enabled');
+}
+
+function goTo(n) {
+  const screens = document.querySelectorAll('.screen');
+  screens.forEach(s => { if (s.classList.contains('active')) { s.classList.remove('active'); s.classList.add('exit'); } });
+  setTimeout(() => {
+    screens.forEach(s => s.classList.remove('exit'));
+    const target = document.getElementById('screen-' + n);
+    if (target) target.classList.add('active');
+    if (n === 5) buildSummary();
+  }, 350);
+}
+
+function buildSummary() {
+  const labels = {
+    1: { title: '결혼 의지', '확신': '진심으로 원함 💍', '탐색': '좋은 사람이라면 🌱', '고민': '고민 중 🤔', '확인': '서비스 탐색 🔍' },
+    2: { title: '마음의 이유', '안정': '안정된 일상 🏠', '성장': '함께 성장 🌿', '가족': '따뜻한 가족 👨‍👩‍👧', '사랑': '깊은 사랑 💜' },
+    3: { title: '희망 시기', '1년내': '1년 안에 ⚡', '2-3년': '2~3년 🗓️', '여유': '사람이 우선 🍃' },
+    4: { title: '첫 만남 기대', '설렘': '두근거림 ✨', '편안': '편안한 대화 ☕', '깊이': '깊이 있는 대화 🎯', '신뢰': '검증된 신뢰 🤝' }
+  };
+  let html = '';
+  for (let i = 1; i <= 4; i++) {
+    const val = answers[i];
+    if (val && labels[i]) {
+      html += `<div class="summary-row"><span class="summary-label">${labels[i].title}</span><span class="summary-value">${labels[i][val] || val}</span></div>`;
+    }
+  }
+  document.getElementById('summaryCard').innerHTML = html;
+}
+</script>
+</body>
+</html>
